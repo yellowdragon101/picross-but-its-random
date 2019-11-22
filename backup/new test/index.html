@@ -7,6 +7,12 @@
 	<script src="app.js"></script>
 </head>
 <body>
+	<div id="changeBtns" class="hid">
+		<input id="old" type="radio" name="aesthetic" onchange="oldHandler()" checked>
+		<label for="old">Old look</label>
+		<input id="new" type="radio" name="aesthetic" onchange="newHandler()">
+		<label for="new">New look</label>
+	</div>
 	<table id="table" class="hid"></table>
 	<p id="check" class="hid"><button onclick="checkAnswer()">Check answer</button></p>
 	<p id="err"></p>
