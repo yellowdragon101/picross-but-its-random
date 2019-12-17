@@ -1,7 +1,12 @@
 let currBoard;
 let answerCount;
+let canMove = false;
+let rmb = false;
 
 document.addEventListener('DOMContentLoaded', function() {
+	document.body.onmouseup = handleMouseUp;
+	document.getElementById("startBtn").onclick = startGame;
+	document.getElementById("checkBtn").onclick = checkAnswer;
 	startGame();
 });
 
@@ -30,21 +35,24 @@ function actuallyMakeBoard(board, top, side) {
 	for(const stub of top) {
 		const cell = topRow.insertCell();
 		cell.innerText = stub.length > 0 ? stub.join('\n') : '0';
-		cell.classList.add("top");
+		cell.classList.add("top", "noselect");
 	}
-	for(let r=0;r<board.length;r++) {
+	for(let r=0; r<board.length;r++) {
 		const row = table.insertRow();
 		const stub = row.insertCell();
 		stub.innerText = side[r].length > 0 ? side[r].join(',') : '0';
-		stub.classList.add("side")
+		stub.classList.add("side", "noselect");
 
 		for(let c=0;c<board[0].length;c++) {
-            cell = row.insertCell();
-            cell.dataset.y = `${r}`
-            cell.dataset.x = `${c}`
-			cell.classList.add('unclicked');
-			cell.addEventListener('click', handleClick);
-			cell.addEventListener('contextmenu', handleRightClick, false);
+			cell = row.insertCell();
+			cell.dataset.y = r;
+			cell.dataset.x = c;
+			cell.classList.add("unclicked");
+			cell.addEventListener('mousedown', handleMouseDown);
+			cell.addEventListener('contextmenu', e => {
+				e.preventDefault();
+			});
+			cell.addEventListener('mouseover', handleMouseOver);
 		}
 	}
 }
@@ -102,8 +110,32 @@ function handleClick(evn) {
     }
 }
 
+function handleMouseOver(evn) {
+	if(canMove == false) return;
+
+	const target = evn.target;
+	
+	if(!rmb) handleClick(evn);
+	if(rmb) handleRightClick(evn);
+}
+
+function handleMouseDown(evn) {
+	canMove = true;
+	if(evn.which == 1) {
+		handleClick(evn);
+		rmb = false;
+	}
+	if(evn.which == 3) {
+		handleRightClick(evn, false);
+		rmb = true;
+	}
+}
+
+function handleMouseUp() {
+	canMove = false;
+}
+
 function handleRightClick(evn) {
-	evn.preventDefault();
 	const target = evn.target;
 
 	if(target.classList.contains("unclicked")) {
@@ -120,18 +152,20 @@ function handleRightClick(evn) {
 	return false;
 }
 
+function handleRMB(evn) {
+	evn.target.preventDefault();
+	
+	return false;
+}
+
 function toVisible() {
 	const table = document.getElementById("table");
 	const check = document.getElementById("check");
-	const btns = document.getElementById("changeBtns");
 	if(table.classList.contains("hid")) {
 		table.classList.toggle("hid");
 	}
 	if(check.classList.contains("hid")) {
 		check.classList.toggle("hid");
-	}
-	if(btns.classList.contains("hid")) {
-		btns.classList.toggle("hid");
 	}
 }
 
